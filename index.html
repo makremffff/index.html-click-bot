@@ -246,23 +246,31 @@
         async function loadUser() {
             const data = await callAPI('login', { user: tg.initDataUnsafe.user });
             if (data.user) {
-                pointsBalance.textContent = data.user.points;
-                usdtBalance.textContent = parseFloat(data.user.usdt).toFixed(3);
-                referralCountEl.textContent = data.user.referral_count || 0;
-                $('userName').textContent = data.user.username || 'user_' + userID;
-                $('userUsername').textContent = '@' + (data.user.username || 'user_' + userID);
-                if (data.user.photo_url) $('userAvatar').style.backgroundImage = `url(${data.user.photo_url})`;
-                $('userFooter').style.display = 'flex';
+                updateUserFromRes(data);
             }
+        }
+
+        // ===== 5.1) تحديث الواجهة فورًا من الرد القادم =====
+        function updateUserFromRes(data) {
+            if (!data.user) return;
+            pointsBalance.textContent = data.user.points;
+            usdtBalance.textContent = parseFloat(data.user.usdt).toFixed(3);
+            referralCountEl.textContent = data.user.referral_count || 0;
+            adBadge.textContent = data.user.watched;
+            adBadge.style.display = data.user.watched > 0 ? 'flex' : 'none';
+            $('userName').textContent = data.user.username || 'user_' + userID;
+            $('userUsername').textContent = '@' + (data.user.username || 'user_' + userID);
+            if (data.user.photo_url) $('userAvatar').style.backgroundImage = `url(${data.user.photo_url})`;
+            $('userFooter').style.display = 'flex';
         }
 
         // ===== 6) REFERRAL CHECK =====
         async function checkReferral() {
             const ref = new URLSearchParams(location.search).get('startapp')?.replace('ref_', '');
             if (ref && !localStorage.getItem(LS.claimedReferral)) {
-                await callAPI('referral', { ref });
+                const { user } = await callAPI('referral', { ref });
+                if (user) updateUserFromRes({ user });
                 localStorage.setItem(LS.claimedReferral, 'true');
-                loadUser();
             }
         }
 
@@ -280,10 +288,10 @@
             // ✅ إعلان أصلي
             window.showGiga().then(async () => {
                 const reward = Math.floor(Math.random() * (200 - 10 + 1)) + 10;
-                const { error } = await callAPI('mystery', { reward });
+                const { error, user } = await callAPI('mystery', { reward });
                 if (!error) {
                     localStorage.setItem(LS.mysteryLastClaim, Date.now());
-                    loadUser();
+                    if (user) updateUserFromRes({ user });
                     mysteryBoxBtn.classList.add('pop');
                     setTimeout(() => mysteryBoxBtn.classList.remove('pop'), 300);
                     alert(`🎁 You got ${reward} points`);
@@ -299,10 +307,10 @@
         quickBonusBtn.onclick = async () => {
             if (!canQuick()) return alert('⚡ Come back after 24h');
             window.showGiga().then(async () => {
-                const { error } = await callAPI('quick', { reward: 500 });
+                const { error, user } = await callAPI('quick', { reward: 500 });
                 if (!error) {
                     localStorage.setItem(LS.quickLastClaim, Date.now());
-                    loadUser();
+                    if (user) updateUserFromRes({ user });
                     quickBonusBtn.classList.add('pop');
                     setTimeout(() => quickBonusBtn.classList.remove('pop'), 300);
                     alert('⚡ Quick bonus +500');
@@ -319,10 +327,10 @@
         $('claimTasks').onclick = async () => {
             if (!$('joinChannelCheck').checked) return alert('Complete task first');
             if (localStorage.getItem(LS.joined)) return alert('Already claimed');
-            const { error } = await callAPI('task', { type: 'join_channel', points: 10000 });
+            const { error, user } = await callAPI('task', { type: 'join_channel', points: 10000 });
             if (!error) {
                 localStorage.setItem(LS.joined, 'true');
-                loadUser();
+                if (user) updateUserFromRes({ user });
                 alert('✅ Joined! +10,000');
                 hideModal('taskModal');
             }
@@ -345,9 +353,9 @@
         $('confirmSwap').onclick = async () => {
             const pts = Math.floor(Number(swapInput.value) / 10000) * 10000;
             if (pts < 10000) return alert('Min 10,000');
-            const { error } = await callAPI('swap', { points: pts });
+            const { error, user } = await callAPI('swap', { points: pts });
             if (!error) {
-                loadUser();
+                if (user) updateUserFromRes({ user });
                 hideModal('swapModal');
                 alert('Swapped successfully!');
             } else alert(error);
@@ -360,9 +368,9 @@
             const addr = $('withdrawAddress').value.trim();
             const amt = parseFloat($('withdrawAmount').value);
             if (!addr || amt < 0.5) return alert('Min 0.5 USDT & valid address');
-            const { error } = await callAPI('withdraw', { addr, amt });
+            const { error, user } = await callAPI('withdraw', { addr, amt });
             if (!error) {
-                loadUser();
+                if (user) updateUserFromRes({ user });
                 hideModal('withdrawModal');
                 alert('Withdrawal request sent!');
             } else alert(error);
@@ -373,10 +381,10 @@
             const counter = parseInt(localStorage.getItem(LS.counter)) || 30;
             if (counter <= 0) return alert('All ads watched! Auto-Click is ON.');
             window.showGiga().then(async () => {
-                const { error, remaining } = await callAPI('watch');
+                const { error, remaining, user } = await callAPI('watch');
                 if (!error) {
                     localStorage.setItem(LS.counter, remaining);
-                    adBadge.textContent = remaining;
+                    if (user) updateUserFromRes({ user });
                     if (remaining === 0 && localStorage.getItem(LS.auto) !== 'true') {
                         localStorage.setItem(LS.auto, 'true');
                         startAutoClick();
