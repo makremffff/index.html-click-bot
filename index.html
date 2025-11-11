@@ -10,223 +10,38 @@
         html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#000;display:flex;justify-content:center;align-items:center}
 
         /*========= LOADING SCREEN (ORIGINAL) =========*/
-        #loadingScreen {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .space-mist {
-            position: absolute;
-            inset: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.08) 0%, transparent 50%);
-            animation: mistFlow 20s ease-in-out infinite;
-        }
-
-        @keyframes mistFlow {
-            0%, 100% { transform: translateX(0) translateY(0) scale(1); }
-            33% { transform: translateX(-20px) translateY(-10px) scale(1.1); }
-            66% { transform: translateX(20px) translateY(10px) scale(0.9); }
-        }
-
-        .logo-container {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            margin-bottom: 60px;
-        }
-
-        .energy-ring {
-            position: absolute;
-            inset: -20px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            background: conic-gradient(from 0deg, transparent, #00bcd4, #c0c0c0, #8a2be2, transparent);
-            animation: rotate 4s linear infinite;
-            filter: blur(1px);
-        }
-
-        .energy-ring::before {
-            content: '';
-            position: absolute;
-            inset: 5px;
-            border-radius: 50%;
-            background: #000;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .logo {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 
-                0 0 40px rgba(0, 188, 212, 0.5),
-                inset 0 0 20px rgba(255, 255, 255, 0.1);
-            animation: levitate 3s ease-in-out infinite;
-        }
-
-        @keyframes levitate {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-10px) scale(1.05); }
-        }
-
-        .logo::before {
-            content: '₿';
-            font-size: 48px;
-            background: linear-gradient(135deg, #00bcd4, #c0c0c0, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(0, 188, 212, 0.8));
-        }
-
-        .particles {
-            position: absolute;
-            inset: -40px;
-            border-radius: 50%;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #00bcd4;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #00bcd4;
-        }
-
-        .particle:nth-child(1) {
-            top: 0;
-            left: 50%;
-            animation: orbit 6s linear infinite;
-        }
-
-        .particle:nth-child(2) {
-            top: 50%;
-            right: 0;
-            animation: orbit 6s linear infinite 1.5s;
-        }
-
-        .particle:nth-child(3) {
-            bottom: 0;
-            left: 50%;
-            animation: orbit 6s linear infinite 3s;
-        }
-
-        .particle:nth-child(4) {
-            top: 50%;
-            left: 0;
-            animation: orbit 6s linear infinite 4.5s;
-        }
-
-        @keyframes orbit {
-            0% { transform: rotate(0deg) translateX(80px) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); opacity: 0; }
-        }
-
-        .progress-container {
-            width: 280px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00bcd4, #c0c0c0, #8a2be2);
-            border-radius: 3px;
-            width: 0%;
-            animation: fillProgress 3s ease-out forwards;
-            box-shadow: 0 0 20px #00bcd4;
-            position: relative;
-        }
-
-        .progress-bar::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 1.5s ease-in-out infinite;
-        }
-
-        @keyframes fillProgress {
-            to { width: 100%; }
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .progress-text {
-            font-size: 24px;
-            font-weight: 200;
-            color: #fff;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .loading-text {
-            font-size: 14px;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 4px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .dust-particles {
-            position: absolute;
-            inset: 0;
-        }
-
-        .dust {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            animation: float 20s linear infinite;
-        }
-
-        .dust:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .dust:nth-child(2) { top: 60%; left: 80%; animation-delay: 5s; }
-        .dust:nth-child(3) { top: 80%; left: 30%; animation-delay: 10s; }
-        .dust:nth-child(4) { top: 40%; left: 60%; animation-delay: 15s; }
-
-        @keyframes float {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
-        }
+        #loadingScreen{position:fixed;inset:0;background:radial-gradient(ellipse at center,#0a0a0a 0%,#000 100%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+        .space-mist{position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(120,119,198,.1) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.05) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(138,43,226,.08) 0%,transparent 50%);animation:mistFlow 20s ease-in-out infinite}
+        @keyframes mistFlow{0%,100%{transform:translateX(0) translateY(0) scale(1)}33%{transform:translateX(-20px) translateY(-10px) scale(1.1)}66%{transform:translateX(20px) translateY(10px) scale(0.9)}}
+        .logo-container{position:relative;width:140px;height:140px;margin-bottom:60px}
+        .energy-ring{position:absolute;inset:-20px;border-radius:50%;border:2px solid transparent;background:conic-gradient(from 0deg,transparent,#00bcd4,#c0c0c0,#8a2be2,transparent);animation:rotate 4s linear infinite;filter:blur(1px)}
+        .energy-ring::before{content:'';position:absolute;inset:5px;border-radius:50%;background:#000}
+        @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        .logo{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2a,#1a1a1a);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,188,212,.5),inset 0 0 20px rgba(255,255,255,.1);animation:levitate 3s ease-in-out infinite}
+        @keyframes levitate{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
+        .logo::before{content:'₿';font-size:48px;background:linear-gradient(135deg,#00bcd4,#c0c0c0,#8a2be2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(0,188,212,.8))}
+        .particles{position:absolute;inset:-40px;border-radius:50%}
+        .particle{position:absolute;width:4px;height:4px;background:#00bcd4;border-radius:50%;box-shadow:0 0 10px #00bcd4}
+        .particle:nth-child(1){top:0;left:50%;animation:orbit 6s linear infinite}
+        .particle:nth-child(2){top:50%;right:0;animation:orbit 6s linear infinite 1.5s}
+        .particle:nth-child(3){bottom:0;left:50%;animation:orbit 6s linear infinite 3s}
+        .particle:nth-child(4){top:50%;left:0;animation:orbit 6s linear infinite 4.5s}
+        @keyframes orbit{0%{transform:rotate(0deg) translateX(80px) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:rotate(360deg) translateX(80px) rotate(-360deg);opacity:0}}
+        .progress-container{width:280px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;position:relative;margin-bottom:30px;box-shadow:0 0 20px rgba(0,188,212,.3)}
+        .progress-bar{height:100%;background:linear-gradient(90deg,#00bcd4,#c0c0c0,#8a2be2);border-radius:3px;width:0%;animation:fillProgress 3s ease-out forwards;box-shadow:0 0 20px #00bcd4;position:relative}
+        .progress-bar::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 1.5s ease-in-out infinite}
+        @keyframes fillProgress{to{width:100%}}
+        @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+        .progress-text{font-size:24px;font-weight:200;color:#fff;margin-bottom:10px;letter-spacing:2px;text-shadow:0 0 20px rgba(255,255,255,.5)}
+        .loading-text{font-size:14px;font-weight:300;color:rgba(255,255,255,.8);letter-spacing:4px;animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+        .dust-particles{position:absolute;inset:0}
+        .dust{position:absolute;width:2px;height:2px;background:rgba(255,255,255,.3);border-radius:50%;animation:float 20s linear infinite}
+        .dust:nth-child(1){top:20%;left:10%;animation-delay:0s}
+        .dust:nth-child(2){top:60%;left:80%;animation-delay:5s}
+        .dust:nth-child(3){top:80%;left:30%;animation-delay:10s}
+        .dust:nth-child(4){top:40%;left:60%;animation-delay:15s}
+        @keyframes float{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(50px);opacity:0}}
 
         /*========= IPHONE FRAME – SAME AS BEFORE =========*/
         .iphone-frame{position:relative;width:min(390px,92vw);height:93.5vh;background:#000;border-radius:50px;padding:8px;box-shadow:0 0 0 2px #1f1f1f,0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
@@ -380,7 +195,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // ===== 1) CONFIG =====
-        const API_BASE = 'https://yourdomain.vercel.app/api'; // <— غيّره
+        const API_BASE = 'https://click-bot-nine.vercel.app/api'; // ✅ الرابط الجديد
         const tg = window.Telegram.WebApp;
         const userID = tg.initDataUnsafe?.user?.id || 999999;
         const userName = tg.initDataUnsafe?.user?.username || 'user_' + userID;
