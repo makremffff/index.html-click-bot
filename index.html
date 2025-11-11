@@ -1,454 +1,485 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT App – Telegram WebApp</title>
-    <style>
-        /*========= CORE RESET & BASE =========*/
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#000;display:flex;justify-content:center;align-items:center}
-
-        /*========= LOADING SCREEN (ORIGINAL) =========*/
-        #loadingScreen{position:fixed;inset:0;background:radial-gradient(ellipse at center,#0a0a0a 0%,#000 100%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
-        .space-mist{position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(120,119,198,.1) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.05) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(138,43,226,.08) 0%,transparent 50%);animation:mistFlow 20s ease-in-out infinite}
-        @keyframes mistFlow{0%,100%{transform:translateX(0) translateY(0) scale(1)}33%{transform:translateX(-20px) translateY(-10px) scale(1.1)}66%{transform:translateX(20px) translateY(10px) scale(0.9)}}
-        .logo-container{position:relative;width:140px;height:140px;margin-bottom:60px}
-        .energy-ring{position:absolute;inset:-20px;border-radius:50%;border:2px solid transparent;background:conic-gradient(from 0deg,transparent,#00bcd4,#c0c0c0,#8a2be2,transparent);animation:rotate 4s linear infinite;filter:blur(1px)}
-        .energy-ring::before{content:'';position:absolute;inset:5px;border-radius:50%;background:#000}
-        @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        .logo{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2a,#1a1a1a);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,188,212,.5),inset 0 0 20px rgba(255,255,255,.1);animation:levitate 3s ease-in-out infinite}
-        @keyframes levitate{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
-        .logo::before{content:'₿';font-size:48px;background:linear-gradient(135deg,#00bcd4,#c0c0c0,#8a2be2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(0,188,212,.8))}
-        .particles{position:absolute;inset:-40px;border-radius:50%}
-        .particle{position:absolute;width:4px;height:4px;background:#00bcd4;border-radius:50%;box-shadow:0 0 10px #00bcd4}
-        .particle:nth-child(1){top:0;left:50%;animation:orbit 6s linear infinite}
-        .particle:nth-child(2){top:50%;right:0;animation:orbit 6s linear infinite 1.5s}
-        .particle:nth-child(3){bottom:0;left:50%;animation:orbit 6s linear infinite 3s}
-        .particle:nth-child(4){top:50%;left:0;animation:orbit 6s linear infinite 4.5s}
-        @keyframes orbit{0%{transform:rotate(0deg) translateX(80px) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:rotate(360deg) translateX(80px) rotate(-360deg);opacity:0}}
-        .progress-container{width:280px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;position:relative;margin-bottom:30px;box-shadow:0 0 20px rgba(0,188,212,.3)}
-        .progress-bar{height:100%;background:linear-gradient(90deg,#00bcd4,#c0c0c0,#8a2be2);border-radius:3px;width:0%;animation:fillProgress 3s ease-out forwards;box-shadow:0 0 20px #00bcd4;position:relative}
-        .progress-bar::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 1.5s ease-in-out infinite}
-        @keyframes fillProgress{to{width:100%}}
-        @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-        .progress-text{font-size:24px;font-weight:200;color:#fff;margin-bottom:10px;letter-spacing:2px;text-shadow:0 0 20px rgba(255,255,255,.5)}
-        .loading-text{font-size:14px;font-weight:300;color:rgba(255,255,255,.8);letter-spacing:4px;animation:pulse 2s ease-in-out infinite}
-        @keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
-        .dust-particles{position:absolute;inset:0}
-        .dust{position:absolute;width:2px;height:2px;background:rgba(255,255,255,.3);border-radius:50%;animation:float 20s linear infinite}
-        .dust:nth-child(1){top:20%;left:10%;animation-delay:0s}
-        .dust:nth-child(2){top:60%;left:80%;animation-delay:5s}
-        .dust:nth-child(3){top:80%;left:30%;animation-delay:10s}
-        .dust:nth-child(4){top:40%;left:60%;animation-delay:15s}
-        @keyframes float{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(50px);opacity:0}}
-
-        /*========= IPHONE FRAME – SAME AS BEFORE =========*/
-        .iphone-frame{position:relative;width:min(390px,92vw);height:93.5vh;background:#000;border-radius:50px;padding:8px;box-shadow:0 0 0 2px #1f1f1f,0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
-        .iphone-frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:160px;height:30px;background:#000;border-radius:0 0 20px 20px;z-index:3}
-        .side-btns{position:absolute;left:-3px;top:18%;height:25%;display:flex;flex-direction:column;justify-content:space-between}
-        .side-btns span{width:6px;height:32px;background:#1f1f1f;border-radius:4px;box-shadow:inset 0 0 2px rgba(0,0,0,.6)}
-        .screen{width:100%;flex:1;background:#fafafa;border-radius:42px;overflow-y:auto;position:relative;display:flex;flex-direction:column}
-        .status-bar{flex-shrink:0;height:44px;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:14px;font-weight:500;margin-top:10px}
-
-        /*========= CONTENT – SAME AS BEFORE =========*/
-        .content{flex:1;padding:20px 24px 8px;display:flex;flex-direction:column}
-        .top-section{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
-        .balance-section{display:flex;flex-direction:column;gap:4px}
-        .balance-line{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:600;color:#1a1a1a}
-        .timer{font-size:14px;font-weight:300;color:#666;letter-spacing:.5px;margin-top:2px}
-        .buttons-section{display:flex;flex-direction:column;gap:12px}
-        .btn{padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.1);min-width:120px;justify-content:center}
-        .btn-open{background:#00bcd4;color:white}
-        .btn-open:hover{background:#00acc1;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,188,212,.3)}
-        .btn-bonus{background:#ffd54f;color:#333}
-        .btn-bonus:hover{background:#ffca28;transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,213,79,.3)}
-        .center-circle{width:min(200px,45vw);height:min(200px,45vw);margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.15);position:relative;cursor:pointer;flex-shrink:0;overflow:hidden}
-        .center-circle img{width:100%;height:100%;object-fit:cover;display:block}
-        .center-circle.ripple::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:radial-gradient(circle, rgba(255,0,0,.9) 0%, rgba(180,0,0,.85) 22%, rgba(0,0,0,.8) 44%, rgba(255,0,0,.7) 66%, rgba(0,0,0,.6) 88%, transparent 100%);border-radius:50%;transform:translate(-50%,-50%);animation:denseRipple 1.3s ease-out infinite}
-        @keyframes denseRipple{0%{width:0;height:0;opacity:1}100%{width:260px;height:260px;opacity:0}}
-
-        /*========= BOTTOM NAV – SAME AS BEFORE =========*/
-        .bottom-nav{flex-shrink:0;display:flex;justify-content:space-around;padding:12px 0 6px;background:white;margin:0 -24px -8px;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
-        .nav-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s ease}
-        .nav-icon{width:48px;height:48px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#666;transition:all .2s ease}
-        .nav-item:hover .nav-icon{background:#e0e0e0;color:#333}
-        .nav-label{font-size:12px;color:#666;font-weight:500}
-        .ad-badge{position:absolute;top:-6px;right:-6px;background:#ff0033;color:#fff;font-size:11px;font-weight:bold;min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,.4);z-index:2}
-
-        /*========= USER FOOTER – SAME AS BEFORE =========*/
-        .user-footer{flex-shrink:0;background:#fff;margin:0 -24px 0;padding:10px 24px 14px;box-shadow:0 -1px 6px rgba(0,0,0,.05);display:flex;align-items:center;gap:12px;font-size:14px;color:#333}
-        .user-avatar{width:64px;height:64px;border-radius:50%;background-size:cover;background-position:center;background-color:#e0e0e0;flex-shrink:0}
-        .user-name{font-weight:600}
-        .user-username{font-size:12px;color:#666}
-
-        /*========= MONO FONTS =========*/
-        .mono-balance{font-family:"SF Mono","Roboto Mono","Courier New",monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";font-size:18px;letter-spacing:.5px}
-
-        /*========= MODALS =========*/
-        .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:30}
-        .modal-content{background:#1a1a1a;border:1.5px solid rgba(255,215,0,.5);border-radius:12px;padding:14px;width:90%;max-width:300px;color:#fff;font-size:11px;display:flex;flex-direction:column;gap:8px}
-        .modal-content input{padding:7px;font-size:11px;border-radius:6px;border:none;text-align:center}
-        .modal-content button{padding:8px;font-size:11px;border-radius:6px;border:none;background:#FFD700;color:#000;font-weight:bold;cursor:pointer}
-        .close-btn{align-self:flex-end;font-size:14px;cursor:pointer;color:#FFD700}
-        @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
-        .pop{animation:pop .3s ease}
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>USDT App – Telegram WebApp</title>
+  <style>
+    /*========= SAME STYLES AS ORIGINAL =========*/
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#000;display:flex;justify-content:center;align-items:center}
+    #loadingScreen{position:fixed;inset:0;background:radial-gradient(ellipse at center,#0a0a0a 0%,#000 100%);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden}
+    .space-mist{position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(120,119,198,.1) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.05) 0%,transparent 50%),radial-gradient(circle at 50% 50%,rgba(138,43,226,.08) 0%,transparent 50%);animation:mistFlow 20s ease-in-out infinite}
+    @keyframes mistFlow{0%,100%{transform:translateX(0) translateY(0) scale(1)}33%{transform:translateX(-20px) translateY(-10px) scale(1.1)}66%{transform:translateX(20px) translateY(10px) scale(0.9)}}
+    .logo-container{position:relative;width:140px;height:140px;margin-bottom:60px}
+    .energy-ring{position:absolute;inset:-20px;border-radius:50%;border:2px solid transparent;background:conic-gradient(from 0deg,transparent,#00bcd4,#c0c0c0,#8a2be2,transparent);animation:rotate 4s linear infinite;filter:blur(1px)}
+    .energy-ring::before{content:'';position:absolute;inset:5px;border-radius:50%;background:#000}
+    @keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .logo{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2a,#1a1a1a);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,188,212,.5),inset 0 0 20px rgba(255,255,255,.1);animation:levitate 3s ease-in-out infinite}
+    @keyframes levitate{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.05)}}
+    .logo::before{content:'₿';font-size:48px;background:linear-gradient(135deg,#00bcd4,#c0c0c0,#8a2be2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(0,188,212,.8))}
+    .particles{position:absolute;inset:-40px;border-radius:50%}
+    .particle{position:absolute;width:4px;height:4px;background:#00bcd4;border-radius:50%;box-shadow:0 0 10px #00bcd4}
+    .particle:nth-child(1){top:0;left:50%;animation:orbit 6s linear infinite}
+    .particle:nth-child(2){top:50%;right:0;animation:orbit 6s linear infinite 1.5s}
+    .particle:nth-child(3){bottom:0;left:50%;animation:orbit 6s linear infinite 3s}
+    .particle:nth-child(4){top:50%;left:0;animation:orbit 6s linear infinite 4.5s}
+    @keyframes orbit{0%{transform:rotate(0deg) translateX(80px) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:rotate(360deg) translateX(80px) rotate(-360deg);opacity:0}}
+    .progress-container{width:280px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;position:relative;margin-bottom:30px;box-shadow:0 0 20px rgba(0,188,212,.3)}
+    .progress-bar{height:100%;background:linear-gradient(90deg,#00bcd4,#c0c0c0,#8a2be2);border-radius:3px;width:0%;animation:fillProgress 3s ease-out forwards;box-shadow:0 0 20px #00bcd4;position:relative}
+    .progress-bar::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 1.5s ease-in-out infinite}
+    @keyframes fillProgress{to{width:100%}}
+    @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    .progress-text{font-size:24px;font-weight:200;color:#fff;margin-bottom:10px;letter-spacing:2px;text-shadow:0 0 20px rgba(255,255,255,.5)}
+    .loading-text{font-size:14px;font-weight:300;color:rgba(255,255,255,.8);letter-spacing:4px;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+    .dust-particles{position:absolute;inset:0}
+    .dust{position:absolute;width:2px;height:2px;background:rgba(255,255,255,.3);border-radius:50%;animation:float 20s linear infinite}
+    .dust:nth-child(1){top:20%;left:10%;animation-delay:0s}
+    .dust:nth-child(2){top:60%;left:80%;animation-delay:5s}
+    .dust:nth-child(3){top:80%;left:30%;animation-delay:10s}
+    .dust:nth-child(4){top:40%;left:60%;animation-delay:15s}
+    @keyframes float{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(50px);opacity:0}}
+    .iphone-frame{position:relative;width:min(390px,92vw);height:93.5vh;background:#000;border-radius:50px;padding:8px;box-shadow:0 0 0 2px #1f1f1f,0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;overflow:hidden}
+    .iphone-frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:160px;height:30px;background:#000;border-radius:0 0 20px 20px;z-index:3}
+    .side-btns{position:absolute;left:-3px;top:18%;height:25%;display:flex;flex-direction:column;justify-content:space-between}
+    .side-btns span{width:6px;height:32px;background:#1f1f1f;border-radius:4px;box-shadow:inset 0 0 2px rgba(0,0,0,.6)}
+    .screen{width:100%;flex:1;background:#fafafa;border-radius:42px;overflow-y:auto;position:relative;display:flex;flex-direction:column}
+    .status-bar{flex-shrink:0;height:44px;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:14px;font-weight:500;margin-top:10px}
+    .content{flex:1;padding:20px 24px 8px;display:flex;flex-direction:column}
+    .top-section{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+    .balance-section{display:flex;flex-direction:column;gap:4px}
+    .balance-line{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:600;color:#1a1a1a}
+    .timer{font-size:14px;font-weight:300;color:#666;letter-spacing:.5px;margin-top:2px}
+    .buttons-section{display:flex;flex-direction:column;gap:12px}
+    .btn{padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.1);min-width:120px;justify-content:center}
+    .btn-open{background:#00bcd4;color:white}
+    .btn-open:hover{background:#00acc1;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,188,212,.3)}
+    .btn-bonus{background:#ffd54f;color:#333}
+    .btn-bonus:hover{background:#ffca28;transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,213,79,.3)}
+    .center-circle{width:min(200px,45vw);height:min(200px,45vw);margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.15);position:relative;cursor:pointer;flex-shrink:0;overflow:hidden}
+    .center-circle img{width:100%;height:100%;object-fit:cover;display:block}
+    .center-circle.ripple::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:radial-gradient(circle, rgba(255,0,0,.9) 0%, rgba(180,0,0,.85) 22%, rgba(0,0,0,.8) 44%, rgba(255,0,0,.7) 66%, rgba(0,0,0,.6) 88%, transparent 100%);border-radius:50%;transform:translate(-50%,-50%);animation:denseRipple 1.3s ease-out infinite}
+    @keyframes denseRipple{0%{width:0;height:0;opacity:1}100%{width:260px;height:260px;opacity:0}}
+    .bottom-nav{flex-shrink:0;display:flex;justify-content:space-around;padding:12px 0 6px;background:white;margin:0 -24px -8px;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+    .nav-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s ease}
+    .nav-item:hover{transform:translateY(-2px)}
+    .nav-icon{width:48px;height:48px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#666;transition:all .2s ease}
+    .nav-item:hover .nav-icon{background:#e0e0e0;color:#333}
+    .nav-label{font-size:12px;color:#666;font-weight:500}
+    .ad-badge{position:absolute;top:-6px;right:-6px;background:#ff0033;color:#fff;font-size:11px;font-weight:bold;min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,.4);z-index:2}
+    .user-footer{flex-shrink:0;background:#fff;margin:0 -24px 0;padding:10px 24px 14px;box-shadow:0 -1px 6px rgba(0,0,0,.05);display:flex;align-items:center;gap:12px;font-size:14px;color:#333}
+    .user-avatar{width:64px;height:64px;border-radius:50%;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#e0e0e0;flex-shrink:0}
+    .user-info{display:flex;flex-direction:column;gap:2px}
+    .user-name{font-weight:600}
+    .user-username{font-size:12px;color:#666}
+    .mono-balance{font-family:"SF Mono","Roboto Mono","Courier New",monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";font-size:18px;letter-spacing:.5px;text-shadow:0 0 2px rgba(0,0,0,.15)}
+    #countdownTimer{font-family:"SF Mono","Roboto Mono","Courier New",monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";letter-spacing:1px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:30}
+    .modal-content{background:#1a1a1a;border:1.5px solid rgba(255,215,0,.5);border-radius:12px;padding:14px;width:90%;max-width:300px;color:#fff;font-size:11px;display:flex;flex-direction:column;gap:8px}
+    .modal-content input{padding:7px;font-size:11px;border-radius:6px;border:none;text-align:center}
+    .modal-content button{padding:8px;font-size:11px;border-radius:6px;border:none;background:#FFD700;color:#000;font-weight:bold;cursor:pointer}
+    .close-btn{align-self:flex-end;font-size:14px;cursor:pointer;color:#FFD700}
+    @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+    .pop{animation:pop .3s ease}
+  </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen">
-        <div class="space-mist"></div>
-        <div class="dust-particles">
-            <div class="dust"></div>
-            <div class="dust"></div>
-            <div class="dust"></div>
-            <div class="dust"></div>
+
+<!-- Loading Screen -->
+<div id="loadingScreen">
+  <div class="space-mist"></div>
+  <div class="dust-particles"><div class="dust"></div><div class="dust"></div><div class="dust"></div><div class="dust"></div></div>
+  <div class="logo-container">
+    <div class="energy-ring"></div><div class="logo"></div>
+    <div class="particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
+  </div>
+  <div class="progress-text" id="progressText">0%</div>
+  <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="loading-text">LOADING...</div>
+</div>
+
+<!-- iPhone Frame -->
+<div class="iphone-frame" id="mainApp" style="display:none">
+  <div class="side-btns"><span></span><span></span><span></span></div>
+  <div class="screen">
+    <div class="status-bar"><span id="clock">9:41</span><span>100% 🔋</span></div>
+    <div class="content">
+      <div class="top-section">
+        <div class="balance-section">
+          <div class="balance-line"><span>💰 Points: <span id="pointsBalance" class="mono-balance">0</span></span></div>
+          <div class="balance-line"><span>💵 USDT: <span id="usdtBalance" class="mono-balance">0</span></span></div>
+          <div class="timer" id="countdownTimer">03:00:00</div>
         </div>
-        <div class="logo-container">
-            <div class="energy-ring"></div>
-            <div class="logo"></div>
-            <div class="particles">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-            </div>
+        <div class="buttons-section">
+          <button class="btn btn-open" id="mysteryBoxBtn"><span>🎁</span> Open Box</button>
+          <button class="btn btn-bonus" id="quickBonusBtn">Bonus</button>
         </div>
-        <div class="progress-text" id="progressText">0%</div>
-        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-        <div class="loading-text">LOADING...</div>
+      </div>
+      <div class="center-circle" id="mainCircle"><img src="img2.png" alt="center"></div>
+      <div class="bottom-nav">
+        <div class="nav-item" id="taskNav"><div class="nav-icon">📋</div><span class="nav-label">TASK</span></div>
+        <div class="nav-item" id="swapNav"><div class="nav-icon">⇄</div><span class="nav-label">SWAP</span></div>
+        <div class="nav-item" id="watchNav"><div class="nav-icon">👁</div><span class="ad-badge" id="adBadge">30</span><span class="nav-label">WATCH</span></div>
+        <div class="nav-item" id="withdrawNav"><div class="nav-icon">💰</div><span class="nav-label">WITHDRAW</span></div>
+      </div>
     </div>
-
-    <!-- Main App -->
-    <div class="iphone-frame" id="mainApp" style="display:none">
-        <div class="screen">
-            <div class="status-bar"><span id="clock">9:41</span><span>100% 🔋</span></div>
-            <div class="content">
-                <div class="top-section">
-                    <div class="balance-section">
-                        <div class="balance-line">💰 Points: <span id="pointsBalance" class="mono-balance">0</span></div>
-                        <div class="balance-line">💵 USDT: <span id="usdtBalance" class="mono-balance">0</span></div>
-                        <div class="balance-line">👥 Referrals: <span id="referralCount" class="mono-balance">0</span></div>
-                        <div class="timer" id="countdownTimer">03:00:00</div>
-                    </div>
-                    <div class="buttons-section">
-                        <button class="btn btn-open" id="mysteryBoxBtn"><span>🎁</span> Open Box</button>
-                        <button class="btn btn-bonus" id="quickBonusBtn">Bonus</button>
-                    </div>
-                </div>
-                <div class="center-circle" id="mainCircle"><img src="img2.png" alt="center"></div>
-                <div class="bottom-nav">
-                    <div class="nav-item" id="taskNav"><div class="nav-icon">📋</div><span class="nav-label">TASK</span></div>
-                    <div class="nav-item" id="swapNav"><div class="nav-icon">⇄</div><span class="nav-label">SWAP</span></div>
-                    <div class="nav-item" id="watchNav">
-                        <div class="nav-icon">👁</div><span class="ad-badge" id="adBadge">30</span><span class="nav-label">WATCH</span>
-                    </div>
-                    <div class="nav-item" id="withdrawNav"><div class="nav-icon">💰</div><span class="nav-label">WITHDRAW</span></div>
-                </div>
-            </div>
-            <div class="user-footer" id="userFooter">
-                <div class="user-avatar" id="userAvatar"></div>
-                <div class="user-info">
-                    <div class="user-name" id="userName"></div>
-                    <div class="user-username" id="userUsername"></div>
-                </div>
-            </div>
-        </div>
+    <div class="user-footer" id="userFooter" style="display:none">
+      <div class="user-avatar" id="userAvatar"></div>
+      <div class="user-info">
+        <div class="user-name" id="userName"></div>
+        <div class="user-username" id="userUsername"></div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!--========= MODALS =========-->
-    <div class="modal" id="taskModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeTask">&times;</span>
-            <div><strong>Daily Tasks</strong></div>
-            <label><input type="checkbox" id="joinChannelCheck"> Join Channel (+10,000)</label>
-            <button id="claimTasks">Claim Rewards</button>
-            <button class="btn btn-referral" id="copyReferralLink">📎 Copy Referral Link</button>
-        </div>
-    </div>
+<!--========= MODALS =========-->
+<div class="modal" id="taskModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeTask">&times;</span>
+    <div><strong>Daily Tasks</strong></div>
+    <label><input type="checkbox" id="joinChannelCheck" data-pts="10000"> Join Channel (+10,000)</label>
+    <button id="claimTasks">Claim Rewards</button>
+  </div>
+</div>
+<div class="modal" id="swapModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeSwap">&times;</span>
+    <div>Enter points (min 10,000)</div>
+    <input type="number" id="swapInput" min="10000" step="1000" placeholder="10000">
+    <div>You will get: <span id="usdtPreview">0</span> USDT</div>
+    <button id="confirmSwap">Convert Now</button>
+  </div>
+</div>
+<div class="modal" id="withdrawModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeWithdraw">&times;</span>
+    <div>Your Polygon USDT address</div>
+    <input type="text" id="withdrawAddress" placeholder="0x...">
+    <div>Amount to withdraw (min 0.5 USDT)</div>
+    <input type="number" id="withdrawAmount" min="0.5" step="0.1" placeholder="0.5">
+    <button id="confirmWithdraw">Withdraw Now</button>
+  </div>
+</div>
 
-    <div class="modal" id="swapModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeSwap">&times;</span>
-            <div>Enter points (min 10,000)</div>
-            <input type="number" id="swapInput" min="10000" step="1000" placeholder="10000">
-            <div>You will get: <span id="usdtPreview">0</span> USDT</div>
-            <button id="confirmSwap">Convert Now</button>
-        </div>
-    </div>
+<!--========= SCRIPTS =========-->
+<script src="https://ad.gigapub.tech/script?id=3459"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  // Loading screen animation
+  let progress = 0;
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const loadingScreen = document.getElementById('loadingScreen');
+  const mainApp = document.getElementById('mainApp');
 
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeWithdraw">&times;</span>
-            <div>Your Polygon USDT address</div>
-            <input type="text" id="withdrawAddress" placeholder="0x...">
-            <div>Amount to withdraw (min 0.5 USDT)</div>
-            <input type="number" id="withdrawAmount" min="0.5" step="0.1" placeholder="0.5">
-            <button id="confirmWithdraw">Withdraw Now</button>
-        </div>
-    </div>
+  function updateProgress() {
+    if (progress <= 100) {
+      progressBar.style.width = progress + '%';
+      progressText.textContent = progress + '%';
+      progress++;
+      setTimeout(updateProgress, 30);
+    } else {
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          mainApp.style.display = 'flex';
+        }, 500);
+      }, 500);
+    }
+  }
+  updateProgress();
 
-    <!--========= SCRIPTS =========-->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://ad.gigapub.tech/script?id=3459"></script> <!-- ✅ إعلانات GigaPub الأصلي -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        // ===== 1) CONFIG =====
-        const API_BASE = 'https://click-bot-nine.vercel.app/api'; // ✅ الرابط الجديد
-        const tg = window.Telegram.WebApp;
-        const userID = tg.initDataUnsafe?.user?.id || 999999;
-        const userName = tg.initDataUnsafe?.user?.username || 'user_' + userID;
+  /*========= API HELPERS (NEW) =========*/
+  const API = 'https://index-html-click-bot-p9f4.vercel.app';
+  async function apiGetUser(id) {
+    try {
+      const r = await fetch(`${API}/api/user/${id}`);
+      if (!r.ok) throw new Error('fetch failed');
+      return await r.json();
+    } catch {
+      return null;
+    }
+  }
+  async function apiUpdateUser(id, data) {
+    try {
+      await fetch(`${API}/api/user/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch {}
+  }
 
-        // ===== 2) LOCAL KEYS (temp vars only) =====
-        const LS_PREFIX = `usr_${userID}_`;
-        const LS = {
-            counter: LS_PREFIX + 'counter',
-            countdown: LS_PREFIX + 'countdown',
-            auto: LS_PREFIX + 'auto',
-            joined: LS_PREFIX + 'joined',
-            mysteryLastClaim: LS_PREFIX + 'mysteryLastClaim',
-            quickLastClaim: LS_PREFIX + 'quickLastClaim',
-            claimedReferral: LS_PREFIX + 'claimedReferral'
-        };
+  /*========= TELEGRAM =========*/
+  const tg = window.Telegram.WebApp;
+  const userID = tg.initDataUnsafe?.user?.id || 999999;
+  const userName = tg.initDataUnsafe?.user?.username || 'user_' + userID;
+  const LS_PREFIX = `usr_${userID}_`;
 
-        // ===== 3) DOM HELPERS =====
-        const $ = id => document.getElementById(id);
-        const pointsBalance = $('pointsBalance');
-        const usdtBalance = $('usdtBalance');
-        const referralCountEl = $('referralCount');
-        const countdownTimer = $('countdownTimer');
-        const mainCircle = $('mainCircle');
-        const mysteryBoxBtn = $('mysteryBoxBtn');
-        const quickBonusBtn = $('quickBonusBtn');
-        const taskNav = $('taskNav');
-        const swapNav = $('swapNav');
-        const watchNav = $('watchNav');
-        const withdrawNav = $('withdrawNav');
-        const adBadge = $('adBadge');
+  const LS = {
+    clicks: LS_PREFIX + 'clicks',
+    usdt: LS_PREFIX + 'usdt',
+    counter: LS_PREFIX + 'counter',
+    auto: LS_PREFIX + 'auto',
+    countdown: LS_PREFIX + 'countdown',
+    joined: LS_PREFIX + 'joined',
+    mysteryLastClaim: LS_PREFIX + 'mysteryLastClaim',
+    quickLastClaim: LS_PREFIX + 'quickLastClaim'
+  };
 
-        // ===== 4) API CALLER =====
-        async function callAPI(action, body = {}) {
-            try {
-                const res = await fetch(API_BASE, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, uid: userID, ...body })
-                });
-                return await res.json();
-            } catch (err) {
-                console.error('API Error:', err);
-                return { error: 'Network error' };
-            }
-        }
+  let clicks = 0, usdt = 0, counter = 30, autoClickEnabled = false, timeLeft = 3 * 3600;
 
-        // ===== 5) LOAD USER DATA =====
-        async function loadUser() {
-            const data = await callAPI('login', { user: tg.initDataUnsafe.user });
-            if (data.user) {
-                updateUserFromRes(data);
-            }
-        }
+  /*========= DOM SHORTCUTS =========*/
+  const pointsBalance = document.getElementById('pointsBalance');
+  const usdtBalance = document.getElementById('usdtBalance');
+  const countdownTimer = document.getElementById('countdownTimer');
+  const mainCircle = document.getElementById('mainCircle');
+  const mysteryBoxBtn = document.getElementById('mysteryBoxBtn');
+  const quickBonusBtn = document.getElementById('quickBonusBtn');
+  const taskNav = document.getElementById('taskNav');
+  const swapNav = document.getElementById('swapNav');
+  const watchNav = document.getElementById('watchNav');
+  const withdrawNav = document.getElementById('withdrawNav');
+  const adBadge = document.getElementById('adBadge');
 
-        // ===== 5.1) تحديث الواجهة فورًا من الرد القادم =====
-        function updateUserFromRes(data) {
-            if (!data.user) return;
-            pointsBalance.textContent = data.user.points;
-            usdtBalance.textContent = parseFloat(data.user.usdt).toFixed(3);
-            referralCountEl.textContent = data.user.referral_count || 0;
-            adBadge.textContent = data.user.watched;
-            adBadge.style.display = data.user.watched > 0 ? 'flex' : 'none';
-            $('userName').textContent = data.user.username || 'user_' + userID;
-            $('userUsername').textContent = '@' + (data.user.username || 'user_' + userID);
-            if (data.user.photo_url) $('userAvatar').style.backgroundImage = `url(${data.user.photo_url})`;
-            $('userFooter').style.display = 'flex';
-        }
+  const userFooter = document.getElementById('userFooter');
+  const userAvatar = document.getElementById('userAvatar');
+  const userNameEl = document.getElementById('userName');
+  const userUsernameEl = document.getElementById('userUsername');
 
-        // ===== 6) REFERRAL CHECK =====
-        async function checkReferral() {
-            const ref = new URLSearchParams(location.search).get('startapp')?.replace('ref_', '');
-            if (ref && !localStorage.getItem(LS.claimedReferral)) {
-                const { user } = await callAPI('referral', { ref });
-                if (user) updateUserFromRes({ user });
-                localStorage.setItem(LS.claimedReferral, 'true');
-            }
-        }
+  /*========= LOAD USER DATA (API + FALLBACK) =========*/
+  async function loadAll() {
+    const remote = await apiGetUser(userID);
+    if (remote) {
+      clicks = remote.clicks ?? 0;
+      usdt = remote.usdt ?? 0;
+      counter = remote.counter ?? 30;
+      autoClickEnabled = remote.autoClickEnabled ?? false;
+      timeLeft = remote.timeLeft ?? (3 * 3600);
+      localStorage.setItem(LS.mysteryLastClaim, remote.mysteryLastClaim || 0);
+      localStorage.setItem(LS.quickLastClaim, remote.quickLastClaim || 0);
+      localStorage.setItem(LS.joined, remote.joined ? 'true' : '');
+    } else {
+      clicks = parseInt(localStorage.getItem(LS.clicks)) || 0;
+      usdt = parseFloat(localStorage.getItem(LS.usdt)) || 0;
+      counter = parseInt(localStorage.getItem(LS.counter)) || 30;
+      autoClickEnabled = localStorage.getItem(LS.auto) === 'true';
+      timeLeft = parseInt(localStorage.getItem(LS.countdown)) || (3 * 3600);
+    }
+    updateUI();
+    showUserData();
+    if (autoClickEnabled && timeLeft > 0) {
+      startAutoClick();
+      startCountdown();
+    }
+  }
 
-        // ===== 7) UI HELPERS =====
-        function showModal(id) { $(id).style.display = 'flex'; }
-        function hideModal(id) { $(id).style.display = 'none'; }
+  function showUserData() {
+    const u = tg.initDataUnsafe?.user;
+    if (!u) { userFooter.style.display = 'none'; return; }
+    const full = [u.first_name, u.last_name].filter(Boolean).join(' ');
+    userNameEl.textContent = full || 'No Name';
+    userUsernameEl.textContent = u.username ? '@' + u.username : 'غير متاح';
+    if (u.photo_url) userAvatar.style.backgroundImage = `url(${u.photo_url})`;
+    userFooter.style.display = 'flex';
+  }
 
-        // ===== 8) MYSTERY BOX =====
-        function canMystery() {
-            const last = parseInt(localStorage.getItem(LS.mysteryLastClaim)) || 0;
-            return Date.now() - last >= 5 * 60 * 1000;
-        }
-        mysteryBoxBtn.onclick = async () => {
-            if (!canMystery()) return alert('🎁 Come back after 5 min');
-            // ✅ إعلان أصلي
-            window.showGiga().then(async () => {
-                const reward = Math.floor(Math.random() * (200 - 10 + 1)) + 10;
-                const { error, user } = await callAPI('mystery', { reward });
-                if (!error) {
-                    localStorage.setItem(LS.mysteryLastClaim, Date.now());
-                    if (user) updateUserFromRes({ user });
-                    mysteryBoxBtn.classList.add('pop');
-                    setTimeout(() => mysteryBoxBtn.classList.remove('pop'), 300);
-                    alert(`🎁 You got ${reward} points`);
-                }
-            }).catch(() => alert("Ad skipped or failed. No reward."));
-        };
+  function updateUI() {
+    pointsBalance.textContent = clicks;
+    usdtBalance.textContent = usdt.toFixed(3);
+    adBadge.textContent = counter;
+    adBadge.style.display = counter > 0 ? 'flex' : 'none';
+    mainCircle.classList.toggle('ripple', autoClickEnabled);
+  }
 
-        // ===== 9) QUICK BONUS =====
-        function canQuick() {
-            const last = parseInt(localStorage.getItem(LS.quickLastClaim)) || 0;
-            return Date.now() - last >= 24 * 3600 * 1000;
-        }
-        quickBonusBtn.onclick = async () => {
-            if (!canQuick()) return alert('⚡ Come back after 24h');
-            window.showGiga().then(async () => {
-                const { error, user } = await callAPI('quick', { reward: 500 });
-                if (!error) {
-                    localStorage.setItem(LS.quickLastClaim, Date.now());
-                    if (user) updateUserFromRes({ user });
-                    quickBonusBtn.classList.add('pop');
-                    setTimeout(() => quickBonusBtn.classList.remove('pop'), 300);
-                    alert('⚡ Quick bonus +500');
-                }
-            }).catch(() => alert("Ad skipped or failed. No reward."));
-        };
+  async function saveAll() {
+    // Save to API
+    apiUpdateUser(userID, {
+      clicks,
+      usdt,
+      counter,
+      autoClickEnabled,
+      timeLeft,
+      mysteryLastClaim: parseInt(localStorage.getItem(LS.mysteryLastClaim)) || 0,
+      quickLastClaim: parseInt(localStorage.getItem(LS.quickLastClaim)) || 0,
+      joined: localStorage.getItem(LS.joined) === 'true'
+    });
+    // Keep localStorage as backup
+    localStorage.setItem(LS.clicks, clicks);
+    localStorage.setItem(LS.usdt, usdt);
+    localStorage.setItem(LS.counter, counter);
+    localStorage.setItem(LS.auto, autoClickEnabled);
+    localStorage.setItem(LS.countdown, timeLeft);
+  }
 
-        // ===== 10) TASKS =====
-        taskNav.onclick = () => showModal('taskModal');
-        $('closeTask').onclick = () => hideModal('taskModal');
-        $('joinChannelCheck').onchange = e => {
-            if (e.target.checked) window.open('https://t.me/+FlfyjU68Txg2NjE8', '_blank');
-        };
-        $('claimTasks').onclick = async () => {
-            if (!$('joinChannelCheck').checked) return alert('Complete task first');
-            if (localStorage.getItem(LS.joined)) return alert('Already claimed');
-            const { error, user } = await callAPI('task', { type: 'join_channel', points: 10000 });
-            if (!error) {
-                localStorage.setItem(LS.joined, 'true');
-                if (user) updateUserFromRes({ user });
-                alert('✅ Joined! +10,000');
-                hideModal('taskModal');
-            }
-        };
+  /*========= CLICK =========*/
+  mainCircle.addEventListener('click', () => {
+    if (!autoClickEnabled) return;
+    clicks++;
+    updateUI();
+    saveAll();
+  });
 
-        // ===== 11) COPY REF LINK =====
-        $('copyReferralLink').onclick = () => {
-            const link = `https://t.me/SJsbsbshsshjssksBot/play?startapp=ref_${userID}`;
-            navigator.clipboard.writeText(link).then(() => alert('Copied!'));
-        };
+  /*========= MYSTERY BOX =========*/
+  function canClaimMystery() {
+    const last = parseInt(localStorage.getItem(LS.mysteryLastClaim)) || 0;
+    return (Date.now() - last) >= 5 * 60 * 1000;
+  }
+  function updateMysteryVisual() {
+    mysteryBoxBtn.style.border = canClaimMystery() ? '2px solid lime' : '1.5px solid rgba(255,215,0,.5)';
+  }
+  updateMysteryVisual();
+  mysteryBoxBtn.addEventListener('click', () => {
+    if (!canClaimMystery()) return alert('🎁 Come back after 5 minutes');
+    window.showGiga().then(() => {
+      const reward = Math.floor(Math.random() * (200 - 10 + 1)) + 10;
+      clicks += reward;
+      localStorage.setItem(LS.mysteryLastClaim, Date.now());
+      saveAll(); updateUI();
+      mysteryBoxBtn.classList.add('pop');
+      setTimeout(() => mysteryBoxBtn.classList.remove('pop'), 300);
+      alert(`🎁 Congrats! You got ${reward} points`);
+    }).catch(() => alert("Ad skipped or failed. No reward."));
+  });
 
-        // ===== 12) SWAP =====
-        swapNav.onclick = () => showModal('swapModal');
-        $('closeSwap').onclick = () => hideModal('swapModal');
-        const swapInput = $('swapInput'), usdtPreview = $('usdtPreview');
-        swapInput.oninput = () => {
-            const val = Math.floor(Number(swapInput.value) / 10000) * 10000;
-            usdtPreview.textContent = ((val / 10000) * 0.005).toFixed(3);
-        };
-        $('confirmSwap').onclick = async () => {
-            const pts = Math.floor(Number(swapInput.value) / 10000) * 10000;
-            if (pts < 10000) return alert('Min 10,000');
-            const { error, user } = await callAPI('swap', { points: pts });
-            if (!error) {
-                if (user) updateUserFromRes({ user });
-                hideModal('swapModal');
-                alert('Swapped successfully!');
-            } else alert(error);
-        };
+  /*========= QUICK BONUS =========*/
+  function canClaimQuick() {
+    const last = parseInt(localStorage.getItem(LS.quickLastClaim)) || 0;
+    return (Date.now() - last) >= 24 * 60 * 60 * 1000;
+  }
+  function updateQuickVisual() {
+    quickBonusBtn.style.border = canClaimQuick() ? '2px solid lime' : '1.5px solid rgba(255,215,0,.5)';
+  }
+  updateQuickVisual();
+  quickBonusBtn.addEventListener('click', () => {
+    if (!canClaimQuick()) return alert('⚡ Come back after 24 hours');
+    window.showGiga().then(() => {
+      const reward = 500;
+      clicks += reward;
+      localStorage.setItem(LS.quickLastClaim, Date.now());
+      saveAll(); updateUI();
+      quickBonusBtn.classList.add('pop');
+      setTimeout(() => quickBonusBtn.classList.remove('pop'), 300);
+      alert(`⚡ Quick bonus! +${reward} points`);
+    }).catch(() => alert("Ad skipped or failed. No reward."));
+  });
 
-        // ===== 13) WITHDRAW =====
-        withdrawNav.onclick = () => showModal('withdrawModal');
-        $('closeWithdraw').onclick = () => hideModal('withdrawModal');
-        $('confirmWithdraw').onclick = async () => {
-            const addr = $('withdrawAddress').value.trim();
-            const amt = parseFloat($('withdrawAmount').value);
-            if (!addr || amt < 0.5) return alert('Min 0.5 USDT & valid address');
-            const { error, user } = await callAPI('withdraw', { addr, amt });
-            if (!error) {
-                if (user) updateUserFromRes({ user });
-                hideModal('withdrawModal');
-                alert('Withdrawal request sent!');
-            } else alert(error);
-        };
+  /*========= WATCH ADS =========*/
+  watchNav.addEventListener('click', () => {
+    if (counter <= 0) return alert("All ads watched! Auto-Click is ON.");
+    window.showGiga().then(() => {
+      counter--;
+      saveAll(); updateUI();
+      if (counter === 0 && !autoClickEnabled) {
+        autoClickEnabled = true;
+        timeLeft = 3 * 3600;
+        startAutoClick();
+        startCountdown();
+        alert("✅ All ads watched! Auto-Click activated for 3 hours.");
+      }
+    }).catch(() => alert("Ad skipped or failed. No reward."));
+  });
 
-        // ===== 14) WATCH AD =====
-        watchNav.onclick = async () => {
-            const counter = parseInt(localStorage.getItem(LS.counter)) || 30;
-            if (counter <= 0) return alert('All ads watched! Auto-Click is ON.');
-            window.showGiga().then(async () => {
-                const { error, remaining, user } = await callAPI('watch');
-                if (!error) {
-                    localStorage.setItem(LS.counter, remaining);
-                    if (user) updateUserFromRes({ user });
-                    if (remaining === 0 && localStorage.getItem(LS.auto) !== 'true') {
-                        localStorage.setItem(LS.auto, 'true');
-                        startAutoClick();
-                        startCountdown();
-                        alert('✅ All ads watched! Auto-Click activated for 3 hours.');
-                    }
-                }
-            }).catch(() => alert("Ad skipped or failed. No reward."));
-        };
+  /*========= TASKS MODAL =========*/
+  taskNav.addEventListener('click', () => document.getElementById('taskModal').style.display = 'flex');
+  document.getElementById('closeTask').onclick = () => document.getElementById('taskModal').style.display = 'none';
+  document.getElementById('joinChannelCheck').onchange = e => {
+    if (e.target.checked) window.open('https://t.me/+FlfyjU68Txg2NjE8', '_blank');
+  };
+  document.getElementById('claimTasks').onclick = () => {
+    const ch = document.getElementById('joinChannelCheck');
+    if (!ch.checked) return alert('Please complete the task first');
+    if (localStorage.getItem(LS.joined)) return alert('You have already claimed the join bonus');
+    clicks += 10000;
+    localStorage.setItem(LS.joined, 'true');
+    saveAll(); updateUI();
+    ch.disabled = true;
+    alert('Congrats! You got 10,000 points');
+    document.getElementById('taskModal').style.display = 'none';
+  };
 
-        // ===== 15) AUTO CLICK & COUNTDOWN =====
-        let autoInt = null, countInt = null;
-        function startAutoClick() {
-            autoInt = setInterval(() => callAPI('autoclick'), 1000);
-        }
-        function startCountdown() {
-            let left = parseInt(localStorage.getItem(LS.countdown)) || 3 * 3600;
-            countInt = setInterval(() => {
-                if (left <= 0) {
-                    clearInterval(countInt); clearInterval(autoInt);
-                    localStorage.setItem(LS.auto, 'false');
-                    alert('⏰ 3-hour mining ended!'); return;
-                }
-                left--;
-                localStorage.setItem(LS.countdown, left);
-                const h = String(Math.floor(left / 3600)).padStart(2, '0');
-                const m = String(Math.floor((left % 3600) / 60)).padStart(2, '0');
-                const s = String(left % 60).padStart(2, '0');
-                countdownTimer.textContent = `${h}:${m}:${s}`;
-            }, 1000);
-        }
+  /*========= SWAP MODAL =========*/
+  swapNav.addEventListener('click', () => document.getElementById('swapModal').style.display = 'flex');
+  document.getElementById('closeSwap').onclick = () => document.getElementById('swapModal').style.display = 'none';
+  const swapInput = document.getElementById('swapInput');
+  const usdtPreview = document.getElementById('usdtPreview');
+  swapInput.addEventListener('input', () => {
+    const val = Math.floor(Number(swapInput.value) / 10000) * 10000;
+    usdtPreview.textContent = ((val / 10000) * 0.005).toFixed(3);
+  });
+  document.getElementById('confirmSwap').onclick = () => {
+    const pts = Math.floor(Number(swapInput.value) / 10000) * 10000;
+    if (pts < 10000) return alert("Minimum swap is 10,000 points");
+    if (pts > clicks) return alert("Insufficient balance");
+    const reward = (pts / 10000) * 0.005;
+    clicks -= pts; usdt += reward;
+    saveAll(); updateUI();
+    document.getElementById('swapModal').style.display = 'none';
+    alert(`Converted! You received ${reward.toFixed(3)} USDT`);
+  };
 
-        // ===== 16) LOADING SIMULATION (ORIGINAL) =====
-        let prog = 0;
-        const progBar = $('progressBar'), progText = $('progressText'), loadScr = $('loadingScreen'), mainApp = $('mainApp');
-        function updateProgress() {
-            if (prog <= 100) {
-                progBar.style.width = prog + '%';
-                progText.textContent = prog + '%';
-                prog++;
-                setTimeout(updateProgress, 30);
-            } else {
-                setTimeout(() => {
-                    loadScr.style.opacity = '0';
-                    setTimeout(() => {
-                        loadScr.style.display = 'none';
-                        mainApp.style.display = 'flex';
-                    }, 500);
-                }, 500);
-            }
-        }
+  /*========= WITHDRAW MODAL =========*/
+  withdrawNav.addEventListener('click', () => document.getElementById('withdrawModal').style.display = 'flex');
+  document.getElementById('closeWithdraw').onclick = () => document.getElementById('withdrawModal').style.display = 'none';
+  document.getElementById('confirmWithdraw').onclick = () => {
+    const addr = document.getElementById('withdrawAddress').value.trim();
+    const amt = parseFloat(document.getElementById('withdrawAmount').value);
+    if (!addr) return alert("Enter a valid Polygon USDT address");
+    if (isNaN(amt) || amt < 0.5) return alert("Minimum withdraw 0.5 USDT");
+    if (amt > usdt) return alert("Insufficient USDT balance");
 
-        // ===== 17) INIT =====
-        window.addEventListener('DOMContentLoaded', () => {
-            updateProgress();
-            loadUser();
-            checkReferral();
-            if (localStorage.getItem(LS.auto) === 'true') {
-                startAutoClick();
-                startCountdown();
-            }
-        });
+    const telegramToken = "8222744961:AAE90Eehr8PqldV6oKxIS9Yo9hw69Zi83Us";
+    const chatID = "8447940021";
+    const msg = `🚨 New Withdrawal 🚨\n👤 User: @${userName}\n💰 Amount: ${amt.toFixed(3)} USDT\n📍 Polygon Address: <code>${addr}</code>\n✅ Approve: <code>/approve ${addr} ${amt.toFixed(3)}</code>\n❌ Reject: <code>/reject ${addr} ${amt.toFixed(3)}</code>`;
 
-        tg.ready();
-    </script>
+    fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatID, text: msg, parse_mode: "HTML" })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          usdt -= amt;
+          saveAll(); updateUI();
+          document.getElementById('withdrawModal').style.display = 'none';
+          alert("Withdrawal request sent to admin!");
+        } else alert("Failed to send notification.");
+      })
+      .catch(() => alert("Network error."));
+  };
+
+  /*========= AUTO-CLICK & COUNTDOWN =========*/
+  let autoClickInterval = null;
+  let countdownInterval = null;
+
+  function startAutoClick() {
+    autoClickInterval = setInterval(() => {
+      clicks++;
+      updateUI();
+      saveAll();
+    }, 1000);
+  }
+  function startCountdown() {
+    countdownInterval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(countdownInterval); clearInterval(autoClickInterval);
+        autoClickEnabled = false; saveAll(); updateUI();
+        alert("⏰ 3-hour mining ended!"); return;
+      }
+      timeLeft--;
+      const h = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+      const m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+      const s = String(timeLeft % 60).padStart(2, '0');
+      countdownTimer.textContent = `${h}:${m}:${s}`;
+      saveAll();
+    }, 1000);
+  }
+
+  tg.ready();
+</script>
 </body>
 </html>
